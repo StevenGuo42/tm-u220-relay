@@ -1,6 +1,6 @@
 ---
 name: "printing-on-epson-tm-u220"
-description: "Use when writing code that prints to an Epson TM-U220 or similar 9-pin impact (dot matrix) ESC/POS receipt printer, including images, logos, charts, large or red text, or when its output shows garbage or Chinese characters instead of an image, jittered image strips, gaps between strips, or text size commands that do nothing."
+description: "Use when writing code that prints to an Epson TM-U220 or similar 9-pin impact (dot matrix) ESC/POS receipt printer, including images, logos, charts, large or red text, or when its output shows garbage or Chinese characters instead of an image, jittered image strips, gaps between strips, or text size commands that do nothing; also when deploying, configuring or sending jobs to its print relay (tm-u220-relay)."
 ---
 
 # Printing on the Epson TM-U220
@@ -25,7 +25,7 @@ Run `python scripts/tmu220.py selftest` after changing it, and `python scripts/t
 
 ## Scripts and this printer
 
-- The scripts (`scripts/tmu220.py`, `scripts/full_demo.py`) and `reference.md` live in https://github.com/StevenGuo42/tm-u220-skill under `skills/printing-on-epson-tm-u220/`. If they are not next to this file, get them with `git clone --depth 1 https://github.com/StevenGuo42/tm-u220-skill`.
+- The scripts (`scripts/tmu220.py`, `scripts/full_demo.py`) and `reference.md` live in https://github.com/StevenGuo42/tm-u220-relay (private) under `skills/printing-on-epson-tm-u220/`. If they are not next to this file, get them with `gh repo clone StevenGuo42/tm-u220-relay`.
 - Steven's printer: `192.168.50.79`, port 9100, 76 mm paper, ERC-38(B/R) black + red ribbon, Chinese GB18030 model (prints GB18030 Chinese text directly; wrap Chinese lines in `ESC U 1` / `ESC U 0` because the 16-dot font prints in two passes).
 - The printer is on the home network: a cloud workspace can't reach it. Send jobs from a machine on that network, for example the print relay (`app/print_relay.py` in the tm-u220-relay repo, see below).
 
@@ -33,10 +33,12 @@ Run `python scripts/tmu220.py selftest` after changing it, and `python scripts/t
 
 The relay takes HTTP (GET links from web pages, JSON POSTs from scripts) and prints. From the tm-u220-relay repo root, on a machine on the home network:
 
+0. Needs Docker with Compose, and Python 3 for the checks. Get the code: `gh repo clone StevenGuo42/tm-u220-relay && cd tm-u220-relay` (private repo: run `gh auth login` first).
 1. Check the code with no printer: `python3 app/tmu220.py selftest` and `python3 app/print_relay.py --selftest`.
-2. Confirm the printer: `python3 app/tmu220.py id 192.168.50.79`.
+2. Confirm the printer: `python3 app/tmu220.py id 192.168.50.79`. If its address changed, update `PRINTER_IP` in `compose.yaml`.
 3. Put a token in `.env` (git-ignored): `echo "RELAY_TOKEN=$(openssl rand -hex 16)" > .env`. Compose refuses to start without it. POSTs need `Authorization: Bearer <token>` (or `?t=<token>`); GET `/print`, `/test`, `/health` stay open, so keep the port off the internet.
 4. `docker compose up -d`, then `curl http://<host>:8765/health`.
+5. Give clients the same token: on each machine that runs Claude, add `"env": {"RELAY_TOKEN": "<token>"}` to `~/.claude/settings.json`.
 
 Settings in `compose.yaml`: `PRINTER_IP`, `RELAY_PORT`, `RELAY_STATE` (NV logo write budget, kept in `./data`), and optionally `RELAY_NV_DAILY_LIMIT`, `RELAY_DRY_RUN`. `./app` is mounted, not built into an image: after changing code, `docker compose restart`. To try jobs without printing, run `python3 app/print_relay.py --dry-run jobs` (saves `.bin` + `.txt` per job). Logs: `docker compose logs -f`.
 
