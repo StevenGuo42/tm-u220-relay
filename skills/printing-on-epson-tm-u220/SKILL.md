@@ -40,6 +40,8 @@ The relay takes HTTP (GET links from web pages, JSON POSTs from scripts) and pri
 
 Settings in `compose.yaml`: `PRINTER_IP`, `RELAY_PORT`, `RELAY_STATE` (NV logo write budget, kept in `./data`), and optionally `RELAY_NV_DAILY_LIMIT`, `RELAY_DRY_RUN`. `./app` is mounted, not built into an image: after changing code, `docker compose restart`. To try jobs without printing, run `python3 app/print_relay.py --dry-run jobs` (saves `.bin` + `.txt` per job). Logs: `docker compose logs -f`.
 
+To send a job: `curl -H "Authorization: Bearer $RELAY_TOKEN" -d '{"blocks": [...]}' http://192.168.50.31:8765/print` (`/render?format=text` previews without printing). If `RELAY_TOKEN` is unset, ask the user for it; never write the token into files or commit it.
+
 ## Quick reference
 
 | Need | Use | Not |
