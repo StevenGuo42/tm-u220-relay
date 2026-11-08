@@ -1,4 +1,4 @@
-# print-relay
+# tm-u220-relay
 
 HTTP relay for an Epson TM-U220 receipt printer (9-pin impact, ESC/POS over raw TCP 9100). Web pages can't open a raw TCP socket, so they open a link to the relay; scripts POST JSON to it. Python 3.8+, standard library only.
 

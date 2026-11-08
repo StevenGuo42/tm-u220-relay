@@ -27,11 +27,11 @@ Run `python scripts/tmu220.py selftest` after changing it, and `python scripts/t
 
 - The scripts (`scripts/tmu220.py`, `scripts/full_demo.py`) and `reference.md` live in https://github.com/StevenGuo42/tm-u220-skill under `skills/printing-on-epson-tm-u220/`. If they are not next to this file, get them with `git clone --depth 1 https://github.com/StevenGuo42/tm-u220-skill`.
 - Steven's printer: `192.168.50.79`, port 9100, 76 mm paper, ERC-38(B/R) black + red ribbon, Chinese GB18030 model (prints GB18030 Chinese text directly; wrap Chinese lines in `ESC U 1` / `ESC U 0` because the 16-dot font prints in two passes).
-- The printer is on the home network: a cloud workspace can't reach it. Send jobs from a machine on that network, for example the print relay (`app/print_relay.py` in the print-relay repo, see below).
+- The printer is on the home network: a cloud workspace can't reach it. Send jobs from a machine on that network, for example the print relay (`app/print_relay.py` in the tm-u220-relay repo, see below).
 
 ## Deploying the relay
 
-The relay takes HTTP (GET links from web pages, JSON POSTs from scripts) and prints. From the print-relay repo root, on a machine on the home network:
+The relay takes HTTP (GET links from web pages, JSON POSTs from scripts) and prints. From the tm-u220-relay repo root, on a machine on the home network:
 
 1. Check the code with no printer: `python3 app/tmu220.py selftest` and `python3 app/print_relay.py --selftest`.
 2. Confirm the printer: `python3 app/tmu220.py id 192.168.50.79`.
