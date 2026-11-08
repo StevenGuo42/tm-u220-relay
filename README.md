@@ -25,12 +25,16 @@ To share it as a zip, use `cd skills && zip -r printing-on-epson-tm-u220.zip pri
 ## Run
 
 ```sh
-echo "RELAY_TOKEN=$(openssl rand -hex 16)" > .env   # required; protects the POST endpoints
+cat > .env <<EOF          # all required; RELAY_HOST is only for the homepage dashboard labels
+PRINTER_IP=<printer-ip>
+RELAY_HOST=<this-host-ip>
+RELAY_TOKEN=$(openssl rand -hex 16)
+EOF
 docker compose up -d
 curl http://localhost:8765/health
 ```
 
-Without Docker: `python3 app/print_relay.py` (see `--help`). Settings come from `compose.yaml` / the environment: `PRINTER_IP`, `RELAY_PORT`, `RELAY_BIND`, `RELAY_TOKEN`, `RELAY_STATE`, `RELAY_NV_DAILY_LIMIT`, `RELAY_DRY_RUN`. `./app` is mounted, so after changing code run `docker compose restart`.
+Without Docker: `python3 app/print_relay.py --printer <printer-ip>` (see `--help`). Settings come from `compose.yaml` / the environment: `PRINTER_IP`, `RELAY_PORT`, `RELAY_BIND`, `RELAY_TOKEN`, `RELAY_STATE`, `RELAY_NV_DAILY_LIMIT`, `RELAY_DRY_RUN`. `./app` is mounted, so after changing code run `docker compose restart`.
 
 Keep it on the home network: the GET endpoints are open.
 

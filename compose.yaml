@@ -6,7 +6,7 @@ services:
     working_dir: /app
     command: ["python", "-u", "print_relay.py"]
     environment:
-      - PRINTER_IP=192.168.50.79
+      - PRINTER_IP=${PRINTER_IP:?set PRINTER_IP in .env}
       - RELAY_PORT=8765
       - RELAY_STATE=/data/relay_state.json   # NV write budget survives restarts
       - RELAY_TOKEN=${RELAY_TOKEN:?set RELAY_TOKEN in .env}   # POST endpoints are open without it
@@ -21,6 +21,6 @@ services:
       - homepage.group=Home
       - homepage.name=Print Relay
       - homepage.icon=mdi-printer
-      - homepage.href=http://192.168.50.31:8765/
-      - homepage.description=Epson TM-U220 receipt printer — 192.168.50.31:8765
-      - homepage.siteMonitor=http://192.168.50.31:8765/health
+      - homepage.href=http://${RELAY_HOST:?set RELAY_HOST in .env}:8765/
+      - homepage.description=Epson TM-U220 receipt printer — ${RELAY_HOST}:8765
+      - homepage.siteMonitor=http://${RELAY_HOST}:8765/health

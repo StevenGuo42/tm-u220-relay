@@ -8,7 +8,7 @@ height/width, alignment, red, accented text, GB18030 Chinese, images (grid / blu
 fine mode), bar / line / pie charts with legends, inline bars, upside-down pages, stored (NV)
 logos with a daily write budget, cut, cancelling a running job, and asking the printer its model.
 
-    python3 print_relay.py                       printer 192.168.50.79, listens on :8765
+    python3 print_relay.py --printer <ip>        print to <ip>:9100, listens on :8765
     python3 print_relay.py --dry-run jobs        save .bin + .txt per job instead of printing
     python3 print_relay.py --selftest            render every feature, no printer needed
 
@@ -958,7 +958,7 @@ def selftest():
 def main():
     env = os.environ.get
     ap = argparse.ArgumentParser(description='HTTP print relay for the Epson TM-U220')
-    ap.add_argument('--printer', default=env('PRINTER_IP', '192.168.50.79'), help='printer IP (port 9100)')
+    ap.add_argument('--printer', default=env('PRINTER_IP'), help='printer IP (port 9100), required unless --dry-run')
     ap.add_argument('--port', type=int, default=int(env('RELAY_PORT', '8765')))
     ap.add_argument('--bind', default=env('RELAY_BIND', '0.0.0.0'))
     ap.add_argument('--dry-run', metavar='DIR', default=env('RELAY_DRY_RUN'), help='save jobs to DIR instead of printing')
@@ -969,6 +969,8 @@ def main():
     cfg = ap.parse_args()
     if cfg.selftest:
         return selftest()
+    if not cfg.printer and not cfg.dry_run:
+        ap.error('set the printer address: --printer <ip> or PRINTER_IP')
     srv = ThreadingHTTPServer((cfg.bind, cfg.port), Relay)
     srv.cfg, srv.nv = cfg, NVBudget(cfg.state, cfg.nv_daily_limit)
     target = f'dry run into {cfg.dry_run}' if cfg.dry_run else f'printer {cfg.printer}:9100'
