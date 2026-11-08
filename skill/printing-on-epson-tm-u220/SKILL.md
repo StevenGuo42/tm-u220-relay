@@ -27,7 +27,18 @@ Run `python scripts/tmu220.py selftest` after changing it, and `python scripts/t
 
 - The scripts (`scripts/tmu220.py`, `scripts/full_demo.py`) and `reference.md` live in https://github.com/StevenGuo42/tm-u220-skill under `skills/printing-on-epson-tm-u220/`. If they are not next to this file, get them with `git clone --depth 1 https://github.com/StevenGuo42/tm-u220-skill`.
 - Steven's printer: `192.168.50.79`, port 9100, 76 mm paper, ERC-38(B/R) black + red ribbon, Chinese GB18030 model (prints GB18030 Chinese text directly; wrap Chinese lines in `ESC U 1` / `ESC U 0` because the 16-dot font prints in two passes).
-- The printer is on the home network: a cloud workspace can't reach it. Send jobs from a machine on that network, for example the meal planner's `print_relay.py`.
+- The printer is on the home network: a cloud workspace can't reach it. Send jobs from a machine on that network, for example the print relay (`app/print_relay.py` in the print-relay repo, see below).
+
+## Deploying the relay
+
+The relay takes HTTP (GET links from web pages, JSON POSTs from scripts) and prints. From the print-relay repo root, on a machine on the home network:
+
+1. Check the code with no printer: `python3 app/tmu220.py selftest` and `python3 app/print_relay.py --selftest`.
+2. Confirm the printer: `python3 app/tmu220.py id 192.168.50.79`.
+3. Put a token in `.env` (git-ignored): `echo "RELAY_TOKEN=$(openssl rand -hex 16)" > .env`. Compose refuses to start without it. POSTs need `Authorization: Bearer <token>` (or `?t=<token>`); GET `/print`, `/test`, `/health` stay open, so keep the port off the internet.
+4. `docker compose up -d`, then `curl http://<host>:8765/health`.
+
+Settings in `compose.yaml`: `PRINTER_IP`, `RELAY_PORT`, `RELAY_STATE` (NV logo write budget, kept in `./data`), and optionally `RELAY_NV_DAILY_LIMIT`, `RELAY_DRY_RUN`. `./app` is mounted, not built into an image: after changing code, `docker compose restart`. To try jobs without printing, run `python3 app/print_relay.py --dry-run jobs` (saves `.bin` + `.txt` per job). Logs: `docker compose logs -f`.
 
 ## Quick reference
 

@@ -9,6 +9,7 @@ services:
       - PRINTER_IP=192.168.50.79
       - RELAY_PORT=8765
       - RELAY_STATE=/data/relay_state.json   # NV write budget survives restarts
+      - RELAY_TOKEN=${RELAY_TOKEN:?set RELAY_TOKEN in .env}   # POST endpoints are open without it
     volumes:
       - ./app:/app:ro
       - ./data:/data
