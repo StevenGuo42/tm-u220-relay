@@ -1,0 +1,25 @@
+services:
+  print-relay:
+    image: python:3.12-slim
+    container_name: print-relay
+    restart: unless-stopped
+    working_dir: /app
+    command: ["python", "-u", "print_relay.py"]
+    environment:
+      - PRINTER_IP=192.168.50.79
+      - RELAY_PORT=8765
+      - RELAY_STATE=/data/relay_state.json   # NV write budget survives restarts
+    volumes:
+      - ./app:/app:ro
+      - ./data:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "8765:8765"
+    labels:
+      - homepage.group=Home
+      - homepage.name=Print Relay
+      - homepage.icon=mdi-printer
+      - homepage.href=http://192.168.50.31:8765/
+      - homepage.description=Epson TM-U220 receipt printer — 192.168.50.31:8765
+      - homepage.siteMonitor=http://192.168.50.31:8765/health
