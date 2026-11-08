@@ -10,6 +10,18 @@ skill/printing-on-epson-tm-u220/
 compose.yaml              runs the relay in python:3.12-slim on port 8765
 ```
 
+## Skill
+
+`skill/printing-on-epson-tm-u220/` is a Claude skill for writing code that prints to the TM-U220: images and charts as `ESC *` bands, double size, red, Chinese and accented text, and fixes for garbage output. It also has the steps to deploy this relay. `reference.md` has the measurements and sources; `scripts/full_demo.py` prints every feature.
+
+Install it by linking it into Claude's skills folder:
+
+```sh
+ln -s "$PWD/skill/printing-on-epson-tm-u220" ~/.claude/skills/
+```
+
+To share it as a zip, use `cd skill && zip -r printing-on-epson-tm-u220.zip printing-on-epson-tm-u220` (no `-y`), so the zip holds the real `tmu220.py` and not the symlink.
+
 ## Run
 
 ```sh
